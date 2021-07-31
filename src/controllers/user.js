@@ -1,9 +1,9 @@
-const bcrypt = require("bcryptjs");
-const User = require("../models/user");
-const jwt = require("jsonwebtoken")
+import { hash as _hash, compare } from "bcryptjs";
+import User, { findOne } from "../models/user";
+import { sign } from "jsonwebtoken";
 
-exports.createUser = (req, res, next) => {
-    bcrypt.hash(req.body.password, 10).then(hash => {
+export function createUser(req, res, next) {
+    _hash(req.body.password, 10).then(hash => {
         const user = new User({
             email: req.body.email,
             password: hash
@@ -23,9 +23,9 @@ exports.createUser = (req, res, next) => {
             })
     });
 }
-exports.userLogin = (req, res, next) => {
+export function userLogin(req, res, next) {
     let fetchedUser;
-    User.findOne({ email: req.body.email })
+    findOne({ email: req.body.email })
         .then(user => {
             if (!user) {
                 return res.status(401).json({
@@ -33,7 +33,7 @@ exports.userLogin = (req, res, next) => {
                 })
             }
             fetchedUser = user;
-            return bcrypt.compare(req.body.password, user.password)
+            return compare(req.body.password, user.password)
         })
         .then(result => {
             if (!result) {
@@ -41,7 +41,7 @@ exports.userLogin = (req, res, next) => {
                     message: "auth failed"
                 });
             }
-            const token = jwt.sign({ email: fetchedUser.email, userId: fetchedUser._id },
+            const token = sign({ email: fetchedUser.email, userId: fetchedUser._id },
                 process.env.JWT_KEY,
                 {
                     expiresIn: '1h',

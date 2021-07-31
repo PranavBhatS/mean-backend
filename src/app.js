@@ -1,15 +1,15 @@
-const path = require("path");
-const express = require("express");
-const bodyParser = require("body-parser");
+import { join } from "path";
+import express, { static as _static } from "express";
+import { json, urlencoded } from "body-parser";
 
 
-const postsRoutes = require("./routes/posts");
-const userRoutes = require('./routes/user');
+import postsRoutes from "./routes/posts";
+import userRoutes from './routes/user';
 
 const app = express();
-const mongoose = require('mongoose');
+import { connect } from 'mongoose';
 const uri = "mongodb+srv://pranavsarang:pranav@123@cluster0.xezjk.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-mongoose.connect(uri,
+connect(uri,
     { useNewUrlParser: true ,useUnifiedTopology:true})
     .then(() => {
         console.log('database connected')
@@ -18,9 +18,9 @@ mongoose.connect(uri,
         console.log('database error',err)
     })
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use("/images", express.static(path.join("backend/images")))
+app.use(json());
+app.use(urlencoded({ extended: false }))
+app.use("/images", _static(join("backend/images")))
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     // Authorization
@@ -32,5 +32,5 @@ app.use((req, res, next) => {
 app.use('/api/posts', postsRoutes)
 app.use('/api/user', userRoutes)
 
-module.exports = app;
+export default app;
 

@@ -1,10 +1,10 @@
-const multer = require("multer");
+import multer, { diskStorage } from "multer";
 const MIME_TYPE_MAP = {
     "image/png": "png",
     "image/jpeg": "jpg",
     "image/jpg": "jpg"
 };
-const storage = multer.diskStorage({
+const storage = diskStorage({
     destination: (req, file, cb) => {
         const isValid = MIME_TYPE_MAP[file.mimetype];
         let error = new Error("Invalid mime type");
@@ -23,4 +23,4 @@ const storage = multer.diskStorage({
         cb(null, name + "-" + Date.now() + "." + ext);
     }
 });
-module.exports = multer({ storage: storage }).single("image");
+export default multer({ storage: storage }).single("image");

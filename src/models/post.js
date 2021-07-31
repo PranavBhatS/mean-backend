@@ -1,28 +1,28 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+import { Schema as _Schema, model } from "mongoose";
+const Schema = _Schema;
 const postSchema = new Schema(
   {
     title: { type: String, required: true },
     content: { type: String, required: true },
     imagePath: { type: String, required: false },
     creator: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: _Schema.Types.ObjectId,
       ref: "Users",
       required: false,
     },
     createdAt: {
-      type: mongoose.Schema.Types.Date,
+      type: _Schema.Types.Date,
       default: function () {
         return Date.now();
       },
     },
     updatedAt: {
-      type: mongoose.Schema.Types.Date,
+      type: _Schema.Types.Date,
       default: function () {
         return Date.now();
       },
     },
-    postStatus: { type: mongoose.Schema.Types.String, required: true },
+    postStatus: { type: _Schema.Types.String, required: true },
   },
   {
     collection: "Posts",
@@ -30,4 +30,4 @@ const postSchema = new Schema(
   }
 );
 
-module.exports = mongoose.model("Posts", postSchema);
+export default model("Posts", postSchema);

@@ -1,5 +1,5 @@
-const Post = require("../models/post");
-exports.createPost = (req, res, next) => {
+import Post, { find, countDocuments, deleteOne, updateOne, findById } from "../models/post";
+export function createPost(req, res, next) {
   // const url = req.protocol + "://" + req.get("host");
   // console.log(url);
   const post = new Post({
@@ -18,12 +18,12 @@ exports.createPost = (req, res, next) => {
       postId: createdPost._id,
     });
   });
-};
+}
 
-exports.getPosts = (req, res, next) => {
+export function getPosts(req, res, next) {
   const pageSize = +req.query.pageSize;
   const currentPage = +req.query.page;
-  const postQuery = Post.find({}).sort({ updatedAt: -1 });
+  const postQuery = find({}).sort({ updatedAt: -1 });
   let fetchedpost;
   if (pageSize && currentPage) {
     postQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
@@ -31,7 +31,7 @@ exports.getPosts = (req, res, next) => {
   postQuery
     .then((docs) => {
       fetchedpost = docs;
-      return Post.countDocuments();
+      return countDocuments();
     })
     .then((count) => {
       return res.status(200).json({
@@ -40,13 +40,13 @@ exports.getPosts = (req, res, next) => {
         maxCount: count,
       });
     });
-};
-exports.getSinglePost = (req, res, next) => {
+}
+export function getSinglePost(req, res, next) {
   findSinglePost(req.params.id, res);
-};
-exports.deletePost = (req, res, next) => {
+}
+export function deletePost(req, res, next) {
   console.log(req.params.id);
-  Post.deleteOne({
+  deleteOne({
     _id: req.params.id,
     creator: req.userData ? req.userData.userId : null,
   })
@@ -68,8 +68,8 @@ exports.deletePost = (req, res, next) => {
         message: error,
       });
     });
-};
-exports.updatePost = (req, res, next) => {
+}
+export function updatePost(req, res, next) {
   let imagePath = req.body.imagePath;
   if (req.file) {
     const url = req.protocol + "://" + req.get("host");
@@ -82,17 +82,17 @@ exports.updatePost = (req, res, next) => {
     imagePath: imagePath,
     postStatus: req.body.postStatus,
   });
-  Post.updateOne(
+  updateOne(
     { _id: req.params.id, creator: req.userData ? req.userData.userId : null },
     post
   ).then((result) => {
     console.log(result);
     findSinglePost(req.params.id, res);
   });
-};
+}
 
 function findSinglePost(id, res) {
-  Post.findById(id).then((post) => {
+  findById(id).then((post) => {
     if (post) {
       res.status(200).json(post);
     } else {
